@@ -22,16 +22,9 @@ void app_main()
         err = nvs_flash_init();
     }
     ESP_ERROR_CHECK(err);   
-
 	ESP_LOGI(DEBUG_DATE_TIME,"COMPILED AT : %s",__TIME__);
-	// printf("Compiled at: ");
-	// printf(__TIME__);
-	// printf(" ");
-	// printf(__DATE__);
-	// printf("\r\n");
-
 	i2c_master_init();
 	ssd1306_init();
 	task_ssd1306_display_clear();
-	xTaskCreatePinnedToCore(task_ssd1306_display_text , "ssd1306_display_text", 4096, (void *)"multimter", 4,NULL,0);    
+	xTaskCreatePinnedToCore(task_ssd1306_display_text , "ssd1306_display_text", 4096, (void *)"multimter2", 4,NULL,0);    
 }

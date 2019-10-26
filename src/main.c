@@ -26,5 +26,5 @@ void app_main()
 	i2c_master_init();
 	ssd1306_init();
 	task_ssd1306_display_clear();
-	xTaskCreatePinnedToCore(task_ssd1306_display_text , "ssd1306_display_text", 4096, (void *)"multimter2", 4,NULL,0);    
+	xTaskCreatePinnedToCore(task_ssd1306_display_text , "ssd1306_display_text", 4096, (void *)"multimter2 abc", 4,NULL,0);    
 }

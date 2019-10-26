@@ -97,7 +97,6 @@ void task_ssd1306_display_clear()
 void task_ssd1306_contrast(void *ignore) 
 {
 	i2c_cmd_handle_t cmd;
-
 	uint8_t contrast = 0;
 	uint8_t direction = 1;
 	while (true) 
@@ -130,21 +129,19 @@ void task_ssd1306_display_text(void *arg_text)
 {
 	char *text = (char*)arg_text;
 	uint8_t text_len = strlen(text);
+
 	i2c_cmd_handle_t cmd;
-	uint8_t cur_page = 0;
+	uint8_t cur_page = 1;
 	cmd = i2c_cmd_link_create();
 	i2c_master_start(cmd);
 	i2c_master_write_byte(cmd, (OLED_I2C_ADDRESS << 1) | I2C_MASTER_WRITE, true);
-
 	i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_STREAM, true);
 	i2c_master_write_byte(cmd, 0x00, true);            // reset column
 	i2c_master_write_byte(cmd, 0x10, true);
 	i2c_master_write_byte(cmd, 0xB0 | cur_page, true); // reset page
-
 	i2c_master_stop(cmd);
 	i2c_master_cmd_begin(I2C_NUM_0, cmd, 10/portTICK_PERIOD_MS);
 	i2c_cmd_link_delete(cmd);
-
 	for (uint8_t i = 0; i < text_len; i++) 
 	{
 		if (text[i] == '\n') 

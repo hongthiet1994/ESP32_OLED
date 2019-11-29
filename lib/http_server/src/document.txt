@@ -1,0 +1,22 @@
+char*  buf;
+    char* temp;
+    size_t buf_len = httpd_req_get_url_query_len(req) + 1;
+	buf = malloc(buf_len);
+    temp = malloc(LEN_BUFFER_SSID);
+	freeWiFi_Infor();
+    if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) 
+    {         
+        if (httpd_query_key_value(buf, "SSID", temp, LEN_BUFFER_SSID) == ESP_OK)
+        {		       
+            urldecode2((char*)wifi_config.sta.ssid,temp);            
+            ESP_LOGI(TAG, "SSID -> %s", wifi_config.sta.ssid);                         
+		}
+		if (httpd_query_key_value(buf, "PASSWORD", temp, LEN_BUFFER_PASS) == ESP_OK)
+        {
+            urldecode2((char*)wifi_config.sta.password,temp);            
+			ESP_LOGI(TAG, "PASSWORD -> %s", wifi_config.sta.password);
+		}
+	}
+	httpd_resp_set_type(req, "text/html");
+    httpd_resp_send(req, WIFI_CONNECTED, strlen(WIFI_CONNECTED));   
+	return ESP_OK;

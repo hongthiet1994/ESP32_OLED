@@ -63,3 +63,6 @@ void task_ssd1306_display_pattern(void *ignore);
 void task_ssd1306_display_clear();
 void task_ssd1306_contrast(void *ignore);
 void task_ssd1306_display_text(void *arg_text);
+void display_value_debug(char* key, uint8_t len_key,uint32_t num_of_reset,uint8_t cur_page);
+void display_string_debug(char* buffer, uint8_t lenbuffer,uint8_t cur_page);
+void process_display(void *pvParameters);

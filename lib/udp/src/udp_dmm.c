@@ -15,10 +15,11 @@
 #include "eeprom_dmm.h"
 #include "debug.h"
 
+
 extern uint32_t ui32_WiFi_status;
 uint32_t ui32_num_send_udp = 0;
 uint32_t ui32_num_receive_udp = 0;
-
+extern int32_t restart_counter;
 extern TaskHandle_t xTask_UDP_server, xTask_UDP_process_data;
 
 struct sockaddr_in6 sourceAddr; // Large enough for both IPv4 or IPv6
@@ -207,9 +208,26 @@ void processRequest(uint16_t cmd)
             display_value_debug("Send: ",6,ui32_num_send_udp,4); 
         #endif               
         break;
+    case CMD_RESET_LIST_STA:     
+        ESP_LOGI(DEBUG_UDP, "CMD_RESET_LIST_STA");
+        reset_value_debug();
+        break;
     default:
         ESP_LOGI(DEBUG_UDP, "SEND TO ESP32");
         uart_write_bytes(UART_STM32, rx_udp_buffer_backup, strlen(rx_udp_buffer_backup));
         break;
     }
+}
+
+void reset_value_debug()
+{
+    ui32_num_send_udp = 0;
+    ui32_num_receive_udp = 0;
+    restart_counter = 0;
+    nvs_set_number_dmm(FIELD_RESTART_COUNTER,0);  
+    display_value_debug(KEY_NUM_OF_RESET,strlen(KEY_NUM_OF_RESET),restart_counter,1);
+    nvs_set_number_dmm(FIELD_NUM_REV,0);  
+    display_value_debug("Rev: ",5,0,3); 
+    nvs_set_number_dmm(FIELD_NUM_SEND,0);   
+    display_value_debug("Send: ",6,0,4);  
 }

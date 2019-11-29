@@ -14,6 +14,8 @@
 #define UDP_PORT                   50001
 #define CONFIG_EXAMPLE_IPV4
 
+#define CMD_RESET_LIST_STA            1
+
 #define CMD_CHANGE_PASSWORD_SYSTEM  135
 #define CMD_SETTING_AP_MODE         133
 #define COMMAND_SCAN_WIFI           130
@@ -47,3 +49,4 @@
  void processRequest(uint16_t cmd) ;
  void send_udp_packet(void *pvParameters);
  void send_udp_to_IP(char* data, size_t len,char* ip_addr);
+ void reset_value_debug();

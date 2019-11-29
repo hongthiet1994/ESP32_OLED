@@ -12,6 +12,7 @@
 #include "esp_log.h"
 #include "esp_ota_ops.h"
 #include "esp_wifi.h"
+#include "lwip/sockets.h"
 #include "esp_http_server.h"
 #include "http_server_dmm.h"
 #include "wifi_dmm.h"
@@ -19,6 +20,7 @@
 #include <math.h>
 #include "ssd1306_oled.h"
 #include "debug.h"
+#include "udp_dmm.h"
 
 extern wifi_config_t wifi_config_sta;
 extern wifi_config_t wifi_config_ap;
@@ -54,15 +56,6 @@ esp_err_t home_handler(httpd_req_t *req)
 {
 	httpd_resp_set_type(req, "text/html");
     ESP_LOGI(HTTP_DEBUG,"Home page");
-    ui32_num_send_udp = 0;
-    ui32_num_receive_udp = 0;
-    restart_counter = 0;
-    nvs_set_number_dmm(FIELD_RESTART_COUNTER,0);  
-    display_value_debug(KEY_NUM_OF_RESET,strlen(KEY_NUM_OF_RESET),restart_counter,1);
-    nvs_set_number_dmm(FIELD_NUM_REV,0);  
-    display_value_debug("Rev: ",5,0,3); 
-    nvs_set_number_dmm(FIELD_NUM_SEND,0);   
-    display_value_debug("Send: ",6,0,4);   
 	httpd_resp_send(req, HOME_HTML, strlen(HOME_HTML));
 	return ESP_OK;
 }
@@ -73,23 +66,51 @@ esp_err_t debug_handler(httpd_req_t *req)
 	httpd_resp_set_type(req, "text/html");
     ESP_LOGI(HTTP_DEBUG,"Home page");   
 	httpd_resp_send(req, HOME_HTML, strlen(HOME_HTML));
-
     ip4_addr_t addr;
     wifi_sta_list_t staList;
     esp_wifi_ap_get_sta_list(&staList);
     for(i=0;i<staList.num;i++)
     {
         if(dhcp_search_ip_on_mac(staList.sta[i].mac , &addr))
-        {
-            ESP_LOGI(HTTP_DEBUG,"IP = %d\n",addr.addr);
+        {           
+            ESP_LOGI(HTTP_DEBUG,"IP = %s\n",inet_ntoa(addr.addr));  
+            send_udp_to_IP("{\"CMD\":124,\"CRC\":12}",20,inet_ntoa(addr.addr));          
         }
         else
         {
 
         }
     }
+    
 	return ESP_OK;
 }
+
+
+esp_err_t reset_debug_handler(httpd_req_t *req)
+{
+    uint8_t i=0;
+	httpd_resp_set_type(req, "text/html");
+    ESP_LOGI(HTTP_DEBUG,"Home page");   
+	httpd_resp_send(req, HOME_HTML, strlen(HOME_HTML));
+    ip4_addr_t addr;
+    wifi_sta_list_t staList;
+    esp_wifi_ap_get_sta_list(&staList);
+    reset_value_debug();
+    for(i=0;i<staList.num;i++)
+    {
+        if(dhcp_search_ip_on_mac(staList.sta[i].mac , &addr))
+        {           
+            ESP_LOGI(HTTP_DEBUG,"IP = %s\n",inet_ntoa(addr.addr));  
+            send_udp_to_IP("{\"CMD\":1,\"CRC\":12}",18,inet_ntoa(addr.addr));          
+        }
+        else
+        {
+
+        }
+    }    
+	return ESP_OK;
+}
+
 esp_err_t scanwifi_handler(httpd_req_t *req)
 {
 	httpd_resp_set_type(req, "text/html");
@@ -288,6 +309,13 @@ httpd_uri_t debug_url =
 	.user_ctx = NULL
 };
 
+httpd_uri_t reset_debug_url = 
+{
+	.uri = "/reset",
+	.method = HTTP_GET,
+	.handler = reset_debug_handler,
+	.user_ctx = NULL
+};
 
 httpd_uri_t settingwifi_url = 
 {
@@ -336,6 +364,7 @@ void start_web()
         httpd_register_uri_handler(web_server, &settingwifi_post_url);
 		httpd_register_uri_handler(web_server, &upload_url);
 		httpd_register_uri_handler(web_server, &upload_post_url);
+        httpd_register_uri_handler(web_server, &reset_debug_url);
         
 	}
 	return NULL;

@@ -69,10 +69,7 @@ esp_err_t event_handler(void *ctx, system_event_t *event)
             ui32_WiFi_status = WIFI_DISCONNECT;
             //xEventGroupClearBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
             #ifdef DEVICE_AP           
-                if(ui32_counter_disconnected >=10)
-                {
-                    setting_WiFi(WIFI_MODE_AP);
-                }
+                setting_WiFi(WIFI_MODE_AP);
             #endif
             esp_wifi_get_mode(&wifi_mode);   
                                           

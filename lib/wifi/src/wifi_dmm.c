@@ -68,7 +68,8 @@ esp_err_t event_handler(void *ctx, system_event_t *event)
             esp_wifi_connect();
             ui32_WiFi_status = WIFI_DISCONNECT;
             //xEventGroupClearBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
-            esp_wifi_get_mode(&wifi_mode);                                  
+            esp_wifi_get_mode(&wifi_mode);   
+                                          
             break;
         case SYSTEM_EVENT_AP_STA_GOT_IP6:
             ESP_LOGI(WIFI_DEBUG, "SYSTEM_EVENT_STA_GOT_IP6");

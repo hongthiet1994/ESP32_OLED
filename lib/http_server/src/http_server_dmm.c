@@ -66,6 +66,14 @@ esp_err_t home_handler(httpd_req_t *req)
 	httpd_resp_send(req, HOME_HTML, strlen(HOME_HTML));
 	return ESP_OK;
 }
+
+esp_err_t debug_handler(httpd_req_t *req)
+{
+	httpd_resp_set_type(req, "text/html");
+    ESP_LOGI(HTTP_DEBUG,"Home page");   
+	httpd_resp_send(req, HOME_HTML, strlen(HOME_HTML));
+	return ESP_OK;
+}
 esp_err_t scanwifi_handler(httpd_req_t *req)
 {
 	httpd_resp_set_type(req, "text/html");
@@ -255,6 +263,16 @@ httpd_uri_t home_url =
 	.handler = home_handler,
 	.user_ctx = NULL
 };
+
+httpd_uri_t debug_url = 
+{
+	.uri = "/debug",
+	.method = HTTP_GET,
+	.handler = debug_handler,
+	.user_ctx = NULL
+};
+
+
 httpd_uri_t settingwifi_url = 
 {
 	.uri = "/settingwifi",
@@ -297,10 +315,12 @@ void start_web()
 	if (httpd_start(&web_server, &config) == ESP_OK) 
 	{
 		httpd_register_uri_handler(web_server, &home_url);
+        httpd_register_uri_handler(web_server, &debug_url);
         httpd_register_uri_handler(web_server, &settingwifi_url);
         httpd_register_uri_handler(web_server, &settingwifi_post_url);
 		httpd_register_uri_handler(web_server, &upload_url);
 		httpd_register_uri_handler(web_server, &upload_post_url);
+        
 	}
 	return NULL;
 }

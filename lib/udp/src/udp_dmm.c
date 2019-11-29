@@ -180,9 +180,12 @@ void processRequest(uint16_t cmd)
         break;
     case 123:
         ESP_LOGI(DEBUG_UDP, "rev : 123");
-        ui32_num_receive_udp++;      
+        ui32_num_receive_udp++; 
+        ui32_num_send_udp++;      
         nvs_set_number_dmm(FIELD_NUM_REV,ui32_num_receive_udp);  
-        display_value_debug("Rev: ",5,ui32_num_receive_udp,3);          
+        display_value_debug("Rev: ",5,ui32_num_receive_udp,3);  
+        nvs_set_number_dmm(FIELD_NUM_SEND,ui32_num_send_udp);   
+        display_value_debug("Send: ",6,ui32_num_send_udp,4);        
         break;
     default:
         ESP_LOGI(DEBUG_UDP, "SEND TO ESP32");

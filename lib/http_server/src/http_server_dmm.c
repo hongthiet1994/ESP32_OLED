@@ -69,9 +69,25 @@ esp_err_t home_handler(httpd_req_t *req)
 
 esp_err_t debug_handler(httpd_req_t *req)
 {
+    uint8_t i=0;
 	httpd_resp_set_type(req, "text/html");
     ESP_LOGI(HTTP_DEBUG,"Home page");   
 	httpd_resp_send(req, HOME_HTML, strlen(HOME_HTML));
+
+    ip4_addr_t addr;
+    wifi_sta_list_t staList;
+    esp_wifi_ap_get_sta_list(&staList);
+    for(i=0;i<staList.num;i++)
+    {
+        if(dhcp_search_ip_on_mac(staList.sta[i].mac , &addr))
+        {
+            ESP_LOGI(HTTP_DEBUG,"IP = %d\n",addr.addr);
+        }
+        else
+        {
+
+        }
+    }
 	return ESP_OK;
 }
 esp_err_t scanwifi_handler(httpd_req_t *req)

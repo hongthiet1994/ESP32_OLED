@@ -46,3 +46,4 @@
  void parser_json_udp();
  void processRequest(uint16_t cmd) ;
  void send_udp_packet(void *pvParameters);
+ void send_udp_to_IP(char* data, size_t len,char* ip_addr);

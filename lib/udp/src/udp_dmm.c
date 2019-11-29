@@ -13,6 +13,7 @@
 #include "uart_dmm.h"
 #include "ssd1306_oled.h"
 #include "eeprom_dmm.h"
+#include "debug.h"
 
 extern uint32_t ui32_WiFi_status;
 uint32_t ui32_num_send_udp = 0;
@@ -128,14 +129,14 @@ void process_data_udp_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-struct sockaddr_in ip;
+//struct sockaddr_in ip;
 
 void send_udp_packet(void *pvParameters)
 {
-    memset((char *) &ip, 0, sizeof(ip));   
-    ip.sin_family = PF_INET;
-    inet_aton("192.168.4.1", &(ip.sin_addr));
-    ip.sin_port = htons(UDP_PORT);
+    //memset((char *) &ip, 0, sizeof(ip));   
+    //ip.sin_family = PF_INET;
+    //inet_aton("192.168.4.1", &(ip.sin_addr));
+   // ip.sin_port = htons(UDP_PORT);
     for (;;)
     {
         if (ui32_WiFi_status == WIFI_CONNECTED)
@@ -144,13 +145,23 @@ void send_udp_packet(void *pvParameters)
             ui32_num_send_udp++;  
             nvs_set_number_dmm(FIELD_NUM_SEND,ui32_num_send_udp);   
             display_value_debug("Send: ",6,ui32_num_send_udp,4);       
-            sendto(sock, "{\"CMD\":123,\"CRC\":12}",20, 0, (struct sockaddr*)&ip, sizeof(ip));
+            //sendto(sock, "{\"CMD\":123,\"CRC\":12}",20, 0, (struct sockaddr*)&ip, sizeof(ip));
+            send_udp_to_IP("{\"CMD\":123,\"CRC\":12}",20,"192.168.4.1");
             //sendto(sock, "{\"CMD\":126,\"CRC\":12}",20, 0,"192.168.137.1", 13);
-
         }
         vTaskDelay(TIME_SEND_UDP_DEBUG / portTICK_PERIOD_MS);
     }
     vTaskDelete(NULL);
+}
+
+void send_udp_to_IP(char* data, size_t len,char* ip_addr)
+{
+    struct sockaddr_in ip;
+    memset((char *) &ip, 0, sizeof(ip));   
+    ip.sin_family = PF_INET;
+    inet_aton(ip_addr, &(ip.sin_addr));
+    ip.sin_port = htons(UDP_PORT);
+    sendto(sock,data,len, 0, (struct sockaddr*)&ip, sizeof(ip));
 }
 
 void processRequest(uint16_t cmd)
@@ -180,12 +191,20 @@ void processRequest(uint16_t cmd)
         break;
     case 123:
         ESP_LOGI(DEBUG_UDP, "rev : 123");
-        ui32_num_receive_udp++; 
-        ui32_num_send_udp++;      
-        nvs_set_number_dmm(FIELD_NUM_REV,ui32_num_receive_udp);  
-        display_value_debug("Rev: ",5,ui32_num_receive_udp,3);  
-        nvs_set_number_dmm(FIELD_NUM_SEND,ui32_num_send_udp);   
-        display_value_debug("Send: ",6,ui32_num_send_udp,4);        
+        
+        #ifdef DEVICE_STA
+            ui32_num_receive_udp++; 
+            nvs_set_number_dmm(FIELD_NUM_REV,ui32_num_receive_udp);  
+            display_value_debug("Rev: ",5,ui32_num_receive_udp,3);  
+        #endif
+        #ifdef DEVICE_AP
+            ui32_num_receive_udp++; 
+            nvs_set_number_dmm(FIELD_NUM_REV,ui32_num_receive_udp);  
+            display_value_debug("Rev: ",5,ui32_num_receive_udp,3);  
+            ui32_num_send_udp++;          
+            nvs_set_number_dmm(FIELD_NUM_SEND,ui32_num_send_udp);   
+            display_value_debug("Send: ",6,ui32_num_send_udp,4); 
+        #endif               
         break;
     default:
         ESP_LOGI(DEBUG_UDP, "SEND TO ESP32");

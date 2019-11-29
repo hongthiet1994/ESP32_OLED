@@ -11,7 +11,7 @@
 #include "eeprom_dmm.h"
 #include "uart_dmm.h"
 #include "ssd1306_oled.h"
-
+#include "debug.h"
 
 char *ip4;
 
@@ -68,6 +68,12 @@ esp_err_t event_handler(void *ctx, system_event_t *event)
             esp_wifi_connect();
             ui32_WiFi_status = WIFI_DISCONNECT;
             //xEventGroupClearBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+            #ifdef DEVICE_AP           
+                if(ui32_counter_disconnected >=10)
+                {
+                    setting_WiFi(WIFI_MODE_AP);
+                }
+            #endif
             esp_wifi_get_mode(&wifi_mode);   
                                           
             break;

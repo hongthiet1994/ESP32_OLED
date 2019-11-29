@@ -144,7 +144,7 @@ void parser_json_udp()
     {
         int_ChecksumRe = cJSON_GetObjectItem(root,"CRC") -> valueint;
         int_ChecksumCal = ChecksumBufferJson(rx_udp_buffer_backup,len_buffer_udp_backup,CRC_DEFAULT);
-        //ESP_LOGI(DEBUG_JSON, " CRC : %d",int_ChecksumRe);
+        ESP_LOGI(DEBUG_JSON, " CRC : %d",int_ChecksumRe);
         if(int_ChecksumCal != int_ChecksumRe)
         {
             int_cmd = cJSON_GetObjectItem(root,"CMD") -> valueint;	

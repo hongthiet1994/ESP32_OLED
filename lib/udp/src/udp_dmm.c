@@ -106,7 +106,6 @@ void udp_server_task(void *pvParameters)
                 //ESP_LOGI(DEBUG_UDP, "%s", rx_buffer);
             }
         }
-
         if (sock != -1)
         {
             ESP_LOGE(DEBUG_UDP, "Shutting down socket and restarting...");
@@ -130,14 +129,9 @@ void process_data_udp_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-//struct sockaddr_in ip;
 
 void send_udp_packet(void *pvParameters)
 {
-    //memset((char *) &ip, 0, sizeof(ip));   
-    //ip.sin_family = PF_INET;
-    //inet_aton("192.168.4.1", &(ip.sin_addr));
-   // ip.sin_port = htons(UDP_PORT);
     for (;;)
     {
         if (ui32_WiFi_status == WIFI_CONNECTED)
@@ -145,10 +139,8 @@ void send_udp_packet(void *pvParameters)
             ESP_LOGI(DEBUG_UDP, "SEND UDP PACKET");
             ui32_num_send_udp++;  
             nvs_set_number_dmm(FIELD_NUM_SEND,ui32_num_send_udp);   
-            display_value_debug("Send: ",6,ui32_num_send_udp,4);       
-            //sendto(sock, "{\"CMD\":123,\"CRC\":12}",20, 0, (struct sockaddr*)&ip, sizeof(ip));
+            display_value_debug("Send: ",6,ui32_num_send_udp,4);      
             send_udp_to_IP("{\"CMD\":123,\"CRC\":12}",20,"192.168.4.1");
-            //sendto(sock, "{\"CMD\":126,\"CRC\":12}",20, 0,"192.168.137.1", 13);
         }
         vTaskDelay(TIME_SEND_UDP_DEBUG / portTICK_PERIOD_MS);
     }
@@ -169,6 +161,7 @@ void processRequest(uint16_t cmd)
 {
     switch (cmd)
     {
+
     case COMMAND_SCAN_WIFI:
         jsonWiFilist();
         break;
@@ -191,8 +184,7 @@ void processRequest(uint16_t cmd)
         proccess_cmd_change_password_system();
         break;
     case 123:
-        ESP_LOGI(DEBUG_UDP, "rev : 123");
-        
+        //ESP_LOGI(DEBUG_UDP, "rev : 123");        
         #ifdef DEVICE_STA
             ui32_num_receive_udp++; 
             nvs_set_number_dmm(FIELD_NUM_REV,ui32_num_receive_udp);  

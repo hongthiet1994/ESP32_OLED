@@ -56,6 +56,8 @@ void app_main()
     //xTaskCreatePinnedToCore(task_ssd1306_display_text , "ssd1306_display_text", 4096, (void *)"Num_of_reset: ", 4,NULL,0);    
     xTaskCreatePinnedToCore(udp_server_task, "udp_server_task", 4096, NULL, 3, &xTask_UDP_server,1); 
     xTaskCreatePinnedToCore(process_data_udp_task, "process_data_udp_task", 4096, NULL, 2, &xTask_UDP_process_data,1); 
-    //xTaskCreatePinnedToCore(send_udp_packet, "send_udp_packet", 4096, NULL, 4, &xTask_send_udp_packet,1);   // For sta mode
+    #ifdef DEVICE_STA
+        xTaskCreatePinnedToCore(send_udp_packet, "send_udp_packet", 4096, NULL, 4, &xTask_send_udp_packet,1);   // For sta mode
+    #endif
     xTaskCreatePinnedToCore(process_display, "process_display", 4096, NULL, 5, &xTask_display_value_debug,1); 
 }

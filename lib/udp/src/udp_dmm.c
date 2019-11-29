@@ -201,7 +201,8 @@ void processRequest(uint16_t cmd)
             ui32_num_receive_udp++; 
             nvs_set_number_dmm(FIELD_NUM_REV,ui32_num_receive_udp);  
             display_value_debug("Rev: ",5,ui32_num_receive_udp,3);  
-            ui32_num_send_udp++;          
+            ui32_num_send_udp++;    
+            sendto(sock,"{\"CMD\":123,\"CRC\":12}", 20, 0, (struct sockaddr *)&sourceAddr, sizeof(sourceAddr));      
             nvs_set_number_dmm(FIELD_NUM_SEND,ui32_num_send_udp);   
             display_value_debug("Send: ",6,ui32_num_send_udp,4); 
         #endif               
